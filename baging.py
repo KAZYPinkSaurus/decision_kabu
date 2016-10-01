@@ -9,34 +9,59 @@ import numpy as np
 #引数：一次元のリスト
 #返り値：一次元のリスト
 def bootstrap(dataArray):
-    arrayLength = len(dataArray)
-    list = [0]*arrayLength
-    for i in range(arrayLength):
-        list[i] = dataArray[random.randint(0,arrayLength - 1)]
-    return list
+    arrayColumn = len(dataArray)
+    outArray = np.zeros((arrayColumn,len(dataArray[0])))
+    print("Hello")
+    for i in range(arrayColumn):
+        outArray[i] = dataArray[random.randint(0,arrayColumn - 1)]
+    return outArray
 
 #どこでソートする？
 
 #境界線を求める
-#引数：昇順にソートされたデータの座標とクラスの値（ともにリスト）
-#返り値：境界線の値リストのリスト
-def learnBorder(coordinate,value):
-    zValue = 0
-    Xmax = [0,0]   
-    for i in range(100):
-        zValue = zValue + coordinate[i,2]
-        if ( math.fabs(zValue) < math.fabs(Xmax[1])):
-            Xmax = [i,zValue]          
-            #y軸ようにソートし直す######
-    zValue = 0
-    Ymax = [0,0]   
-    for j in range(100):
-        zValue = zValue + coordinate[j,2]
-        if ( math.fabs(zValue) > math.fabs(Ymax[1])):
-            Ymax = [j,zValue]
-    return [Xmax[0],Ymax[0]]
+#引数：２種類のデータ
+#返り値：X、Yの境界線の値
+def learnBorder(data1,data2): 
+    Xmax = 0
+    Ymax = 0
+    for k in [0,1]:
+       # 昇順ソート
+        bindData = np.r_[data1,data2][:,k].argsort()
+        sortedData = np.r_[data1,data2][bindData] 
+        zValue = 0
+        max = [0,0]   
+        for i in range(len(sortedData)):
+            zValue = zValue + sortedData[i,2]
+            if ( math.fabs(zValue) > math.fabs(max[1])):
+                max = [i,zValue]         
+        if k == 0:
+            Xmax = sortedData[max[0],k]
+        else:
+            Ymax = sortedData[max[0],k]
+    return [Xmax,Ymax]
 
+#複数回学習し、結果の境界線の座標リストを返す
+#num:学習回数
+def makeBorderList(data1,data2,num):
+    outArray = np.zeros((num,2))
+    for i in range(num):
+        outArray[i] = learnBorder(bootstrap(data1),bootstrap(data2))
+    return outArray
+    
+    
+#L=makeBorderList(data1,data2,30)   
+#plt.figure()
+#plt.hold(True)
+#plt.scatter(data2[:,0],data2[:,1], c='blue')
+#plt.scatter(data1[:,0],data1[:,1], c='red')
+#for i in range(30):
+#    plt.scatter(L[i,0],0,color="black")
+#    plt.scatter(0,L[i,1],color="black")
 
+    
+    
+    
+   
 Xborder = [2,2,3,2,3,2,3,2,3,2,3,2,3,4,3,2,3,2,4,5,3,2,2,3,4,5]
 Yborder = [3,3,4,3,4,6,5,4,3,2,4,5,6,6,5,4,3,2,2,5,6,6,7,7,7,7]
 
