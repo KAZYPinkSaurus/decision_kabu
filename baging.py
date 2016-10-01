@@ -11,12 +11,10 @@ import numpy as np
 def bootstrap(dataArray):
     arrayColumn = len(dataArray)
     outArray = np.zeros((arrayColumn,len(dataArray[0])))
-    print("Hello")
     for i in range(arrayColumn):
         outArray[i] = dataArray[random.randint(0,arrayColumn - 1)]
     return outArray
 
-#どこでソートする？
 
 #境界線を求める
 #引数：２種類のデータ
@@ -48,46 +46,57 @@ def makeBorderList(data1,data2,num):
         outArray[i] = learnBorder(bootstrap(data1),bootstrap(data2))
     return outArray
     
-    
-#L=makeBorderList(data1,data2,30)   
-#plt.figure()
-#plt.hold(True)
-#plt.scatter(data2[:,0],data2[:,1], c='blue')
-#plt.scatter(data1[:,0],data1[:,1], c='red')
-#for i in range(30):
-#    plt.scatter(L[i,0],0,color="black")
-#    plt.scatter(0,L[i,1],color="black")
 
-    
-    
-    
-   
-Xborder = [2,2,3,2,3,2,3,2,3,2,3,2,3,4,3,2,3,2,4,5,3,2,2,3,4,5]
-Yborder = [3,3,4,3,4,6,5,4,3,2,4,5,6,6,5,4,3,2,2,5,6,6,7,7,7,7]
+#学習して得られた境界線をもとにして、最終的な境界線を求める
+#引数：X軸、Y軸における境界線のリスト
+#返り値：座標リスト
+def makeCoordinateData(Xborder,Yborder):
+    coordinateData = np.array([[0.00]*1000,[0.00]*1000]).T
+    for m in range(0,1000):
+        Xresult = [0,10000000]
+        result_y = 0
+        for k in range(len(Yborder)):
+            if m*0.0025 >= Yborder[k]:
+                result_y = result_y + 1 
+            else:
+                result_y = result_y + -1
+        for j in range(0,1000):
+            result_x = result_y
+            for i in range(len(Xborder)):
+                if j*0.0015 <= Xborder[i]:
+                    result_x = result_x + 1 
+                else:
+                    result_x = result_x + -1
+            if math.fabs(result_x) <= math.fabs(Xresult[1]):
+                Xresult = [j*0.0015,result_x]
+                if (j % 1000) == 0:         
+                    print(j,m)
+                coordinateData[m,:] = [j*0.0015,m*0.0025] 
+    return coordinateData
 
-##学習して得られた境界線をもとにして、最終的な境界線を求める
-##引数：X軸、Y軸における境界線のリスト
-##返り値：座標リスト
-#def plotBorder(Xborder,Yborder):
-#    coordinateData = np.array([[0]*500,[0,500]]).T
-#    for m in range(0,500):
-#        Xresult = [0,1000]
-#        for j in range(0,500):
-#            result = 0
-#            for i in range(len(Xborder)):
-#                if j*0.01 <= Xborder[i]:
-#                    result = result + 1 
-#                else:
-#                    result = result + -1
-#            for k in range(len(Yborder)):
-#                if m*0.01 <= Yborder[k]:
-#                    result = result + 1 
-#                else:
-#                    result = result + -1
-#            if math.fabs(result) < math.fabs(Xresult[1]):
-#                Xresult = [j*0.01,result]
-#        print(Xresult[1]/(len(Xborder)+len(Yborder)))#確率
-#        print(m*0.01) #y座標
-#        #座標を突っ込む仕組みはまだ
-#    return coordinateData
-#    #これをプロットしていけばよさそう
+#散布図を用意
+x1 = np.random.rand(50)
+y1 = 1*x1+np.random.rand(50)*1.1+0.5
+z1 = np.array([1]*50)
+data1 = np.array([x1,y1,z1]).T #.Tは転置
+
+x2 = np.random.rand(50)*0.6 + 0.4
+y2 = 1*x2+np.random.rand(50)*0.5
+z2 = [-1]*50
+
+data2 = np.array([x2,y2,z2]).T #.Tは転置
+
+numOfLearn = 2000 #学習回数
+L=makeBorderList(data1,data2,numOfLearn)   
+K = makeCoordinateData(L[:,0],L[:,1])
+plt.figure()
+plt.hold(True)
+plt.title('decision_kabu')
+plt.xlabel('x(1)')
+plt.ylabel('x(2)')
+plt.scatter(data2[:,0],data2[:,1], c='blue')
+plt.scatter(data1[:,0],data1[:,1], c='red')
+for i in range(1000):#各境界線の位置
+    plt.scatter(L[i,0],0,color="green")
+    plt.scatter(0,L[i,1],color="green")
+plt.plot(K[:,0],K[:,1],color="black")
