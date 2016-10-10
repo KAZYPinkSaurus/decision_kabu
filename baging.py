@@ -74,17 +74,17 @@ def makeCoordinateData(Xborder,Yborder):
                 coordinateData[m,:] = [j*0.0015,m*0.0025] 
     return coordinateData
 
-#散布図を用意
-x1 = np.random.rand(50)
-y1 = 1*x1+np.random.rand(50)*1.1+0.5
-z1 = np.array([1]*50)
-data1 = np.array([x1,y1,z1]).T #.Tは転置
-
-x2 = np.random.rand(50)*0.6 + 0.4
-y2 = 1*x2+np.random.rand(50)*0.5
-z2 = [-1]*50
-
-data2 = np.array([x2,y2,z2]).T #.Tは転置
+##散布図を用意
+#x1 = np.random.rand(50)
+#y1 = 1*x1+np.random.rand(50)*1.1+1.0
+#z1 = np.array([1]*50)
+#data1 = np.array([x1,y1,z1]).T #.Tは転置
+#
+#x2 = np.random.rand(50)
+#y2 = 1*x2+np.random.rand(50)*1.1
+#z2 = [-1]*50
+#
+#data2 = np.array([x2,y2,z2]).T #.Tは転置
 
 numOfLearn = 2000 #学習回数
 L=makeBorderList(data1,data2,numOfLearn)   
